@@ -1,0 +1,101 @@
+
+<?php
+require('fpdf181/fpdf.php');
+$connect = mysqli_connect("localhost","root","","test");
+
+
+    
+$pdf = new FPDF();
+$pdf->AddPage();
+$pdf->SetFont('Arial','B',15);
+$pdf->Cell(70,10,'   blood bank system !',1);
+$pdf->Cell(0,10,"  date : ".date("d-m-y"),1);
+$pdf->Ln(20);
+$pdf->SetFont('Arial','B',10);
+$pdf->Cell(10,10,' ID ',0);
+$pdf->Cell(30,10,' UserName',0);
+$pdf->Cell(35,10,' Email',0);
+$pdf->Cell(20,10,' Password ',0);
+$pdf->Cell(15,10,' BType ',0);
+$pdf->Cell(20,10,' FNAME ',0);
+$pdf->Cell(20,10,' LNAME ',0);
+$pdf->Cell(15,10,'  MOB ',0);
+$pdf->Cell(20,10,' CITY ',0);
+
+/*
+$query = mysqli_query(" SELECT * FROM `users` ");
+while ($query2 = mysqli_fetch_array($query)){
+$pdf->Cell(10,10,$query2['ID'] ,0);
+$pdf->Cell(25,10, $query2['UserName'],0);
+$pdf->Cell(15,10, $query2['Email'],0);
+$pdf->Cell(20,10, $query2['Password'] ,0);
+$pdf->Cell(23,10, $query2['BloodType'] ,0);
+$pdf->Cell(20,10,$query2[' FNAME'] ,0);
+$pdf->Cell(20,10,$query2[' LNAME'] ,0);
+$pdf->Cell(15,10, $query2[' MOB'] ,0);
+$pdf->Cell(20,10,$query2[' CITY'] ,0);
+  $pdf->Ln(20);
+
+}*/
+
+$query = "SELECT * FROM `users` ";
+$result = mysqli_query($connect, $query);
+ while ($query2 = mysqli_fetch_array($result)){
+      $pdf->Ln(20);
+$pdf->Cell(10,10,$query2['id'] ,0);
+$pdf->Cell(30,10, $query2['username'],0);
+$pdf->Cell(35,10, $query2['email'],0);
+$pdf->Cell(20,10, $query2['password'] ,0);
+$pdf->Cell(15,10, $query2['bloodtype'] ,0);
+$pdf->Cell(20,10,$query2['firstname'] ,0);
+$pdf->Cell(20,10,$query2['lastname'] ,0);
+$pdf->Cell(15,10, $query2['mobileno'] ,0);
+$pdf->Cell(20,10,$query2['city'] ,0);
+    
+ }
+$pdf->Output(); 
+
+?>
+//////////////////////////
+<?php
+require('mysql_table.php');
+class PDF extends PDF_MySQL_Table
+{
+function Header()
+{
+	//Title
+	$this->SetFont('Arial','',18);
+	$this->Cell(0,6,'PDF From mysql',0,1,'C');
+	$this->Ln(10);
+	//Ensure table header is output
+	parent::Header();
+}
+}
+//Connect to database
+mysql_connect("localhost","root","") or die("couldnot connect") ;
+mysql_select_db("test")or die("couldnot connect") ;
+$pdf=new PDF();
+$pdf->AddPage();
+//First table: put all columns automatically
+$pdf->Table('SELECT `id`, `firstname`,`lastname`,`city`,`bloodtype` , `birthdate`,`mobileno`,`username`,`email`,`password`  from users order by `id`');
+$pdf->AddPage();
+//Second table: specify 3 columns
+$pdf->AddCol('id',40,'','C');
+$pdf->AddCol('firstname',40,'projekt','C');
+$pdf->AddCol('lastname',40,'','C');
+$pdf->AddCol('city',40,'','C');
+$pdf->AddCol('bloodtype',40,'projekt','C');
+$pdf->AddCol('birthdate',40,'','C');
+$pdf->AddCol('mobileno',40,'','C');
+$pdf->AddCol('username',40,'','C');
+$pdf->AddCol('email',40,'','C');
+$pdf->AddCol('password',40,'','C');
+$prop=array('HeaderColor'=>array(255,150,100),
+			'color1'=>array(210,245,255),
+			'color2'=>array(255,255,210),
+			'padding'=>2);
+$pdf->Table('select firstname, lastname ,city, bloodtype , birthdate,mobileno,username,email,password from users order by id limit 0,20',$prop);
+//$pdf->Output("C:\Users\John\Desktop/somename.pdf",'F'); 
+header('Content-type: projekter/pdf');
+$pdf->Output('projekter'.".pdf", 'D'); 
+//header('Location: '.projekter.".pdf");
